@@ -2,6 +2,7 @@
 import time
 import hashlib
 import random
+import getpass
 
 db = {}
 
@@ -29,12 +30,12 @@ def newuser():
       continue
     else:
       break
-  pwd = input('passwd: ')
+  pwd = getpass.getpass('passwd: ')
   add_user(name, pwd)
 
 def olduser():
   name = input('login: ')
-  pwd = input('passwd: ')
+  pwd = getpass.getpass('passwd: ')
   now = time.time()
   (logtime, salt, pwd_hash) = db.get(name)
   pwd_hash2 = get_pwd_hash(salt, pwd)
@@ -49,7 +50,6 @@ def olduser():
 
 def deluser():
   name = input('login: ')
-  (passwd, logtime) = db.get(name)
   if name in db:
     del db[name]
     print('Drop user', name)
