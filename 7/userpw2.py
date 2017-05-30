@@ -3,6 +3,7 @@ import time
 import hashlib
 import random
 import getpass
+import distutils.util
 
 db = {}
 
@@ -33,26 +34,27 @@ def valid_name(name):
       return False
   return True
 
-def newuser():
-  prompt = 'login desired: '
+def prompt_login():
+  prompt = 'login: '
   while True:
     name = input(prompt)
     if not valid_name(name):
       prompt = 'not a valid name, only characters allowed: '
       continue
-    elif get_name_hash(name) in db:
-      prompt = 'name taken, try another: '
-      continue
     else:
+      if get_name_hash(name) in db:
+        pwd = getpass.getpass('passwd: ')
+        do_login(name, pwd)
+      else:
+        answer = input('No such user, create new? [y/n]: ')
+        if distutils.util.strtobool(answer):
+          pwd = getpass.getpass('passwd: ')
+          add_user(name, pwd)
       break
-  pwd = getpass.getpass('passwd: ')
-  add_user(name, pwd)
 
-def olduser():
-  name = input('login: ')
-  pwd = getpass.getpass('passwd: ')
+def do_login(name, pwd):
   now = time.time()
-  entry = db.get(get_name_hash(name))
+  entry = db[get_name_hash(name)]
   pwd_hash = get_pwd_hash(entry['salt'], pwd)
   if pwd_hash == entry['pwd_hash']:
     if (now - entry['logtime']) < (4*60*60):
@@ -61,7 +63,7 @@ def olduser():
       print('Welcome back {}, last login {}'.format(name, time.ctime(entry['logtime'])))
       entry['logtime'] = now
   else:
-    print('Login incorrect')
+    print('Password incorrect')
 
 def deluser():
   name = input('login: ')
@@ -79,8 +81,7 @@ def showusers():
 
 def showmenu():
   prompt = """
-(N)ew User Login
-(E)xisting User Login
+(L)ogin
 (D)elete Existing User
 (S)how All Users
 (P)rint Debug Info
@@ -95,15 +96,14 @@ Enter choice: """
       except (EOFError, KeyboardInterrupt):
         choice = 'q'
       print('\nYou picked: [%s]' % choice)
-      if choice not in 'nedspq':
+      if choice not in 'ldspq':
         print('invalid option, try again')
       else:
         chosen = True
     if choice == 'q': done = True
-    if choice == 'n': newuser()
+    if choice == 'l': prompt_login()
     if choice == 'd': deluser()
     if choice == 's': showusers()
-    if choice == 'e': olduser()
     if choice == 'p': print(db)
 
 if __name__ == '__main__':
