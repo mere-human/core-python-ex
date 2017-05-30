@@ -27,11 +27,20 @@ def add_user(name, pwd, logtime = time.time()):
                              'salt':salt,
                              'pwd_hash':pwd_hash}
 
+def valid_name(name):
+  for ch in name:
+    if not ch.isalpha():
+      return False
+  return True
+
 def newuser():
   prompt = 'login desired: '
   while True:
     name = input(prompt)
-    if get_name_hash(name) in db:
+    if not valid_name(name):
+      prompt = 'not a valid name, only characters allowed: '
+      continue
+    elif get_name_hash(name) in db:
       prompt = 'name taken, try another: '
       continue
     else:
