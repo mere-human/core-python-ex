@@ -16,16 +16,22 @@ def get_hash_str(s):
 def get_pwd_hash(salt, pwd):
   return get_hash_str('%s%s' % (salt, get_hash_str(pwd)))
   
+def get_name_hash(name):
+  return hash(name.lower())
+  
 def add_user(name, pwd, logtime = time.time()):
   salt = get_salt()
   pwd_hash = get_pwd_hash(salt, pwd)
-  db[name] = (logtime, salt, pwd_hash)
+  db[get_name_hash(name)] = {'name':name,
+                             'logtime':logtime,
+                             'salt':salt,
+                             'pwd_hash':pwd_hash}
 
 def newuser():
   prompt = 'login desired: '
   while True:
     name = input(prompt)
-    if name in db:
+    if get_name_hash(name) in db:
       prompt = 'name taken, try another: '
       continue
     else:
@@ -37,29 +43,30 @@ def olduser():
   name = input('login: ')
   pwd = getpass.getpass('passwd: ')
   now = time.time()
-  (logtime, salt, pwd_hash) = db.get(name)
-  pwd_hash2 = get_pwd_hash(salt, pwd)
-  if pwd_hash2 == pwd_hash:
-    if (now - logtime) < (4*60*60):
-      print('You already logged in at: ', time.ctime(logtime))
+  entry = db.get(get_name_hash(name))
+  pwd_hash = get_pwd_hash(entry['salt'], pwd)
+  if pwd_hash == entry['pwd_hash']:
+    if (now - entry['logtime']) < (4*60*60):
+      print('You already logged in at: ', time.ctime(entry['logtime']))
     else:
-      print('Welcome back {}, last login {}'.format(name, time.ctime(logtime)))
-      db[name] = (now, salt, pwd_hash)
+      print('Welcome back {}, last login {}'.format(name, time.ctime(entry['logtime'])))
+      entry['logtime'] = now
   else:
     print('Login incorrect')
 
 def deluser():
   name = input('login: ')
-  if name in db:
-    del db[name]
+  name_hash = get_name_hash(name)
+  if name_hash in db:
+    del db[name_hash]
     print('Drop user', name)
   else:
     print('User does not exist')
     
 def showusers():
   print('Users:')
-  for name in db:
-    print(' ', name)
+  for k in db:
+    print(' ', db[k]['name'])
 
 def showmenu():
   prompt = """
