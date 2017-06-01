@@ -15,32 +15,47 @@ necessary to arrive at a solution.
 '''
 def tr(srcstr, dststr, string, icase=False):
   # build a map
+  skip_char_val = 1
   map = {}
-  n = min(len(srcstr), len(dststr))
+  n = max(len(srcstr), len(dststr))
   for i in range(n):
     srcchr = srcstr[i].lower() if icase else srcstr[i]
-    dstchr = dststr[i].lower() if icase else dststr[i]
+    if i < len(dststr):
+      dstchr = dststr[i].lower() if icase else dststr[i]
+    else:
+      dstchr = skip_char_val
     map[srcchr] = dstchr
   # translate a string
   res = []
   for ch in string:
     mapch = map.get(ch.lower() if icase else ch)
-    if mapch:
+    if mapch == skip_char_val:
+      # skip character
+      continue
+    elif mapch is None:
+      # character is not mapped
+      res.append(ch)
+    else:
+      # translate character
       if icase:
         # update case
         mapch = mapch.upper() if ch.isupper() else mapch.lower()
       res.append(mapch)
-    else:
-      res.append(ch)
   return ''.join(res)
   
 def test():
   t = tr('abc', 'mno', 'abcdef')
   assert t == 'mnodef'
+  
   t = tr('abc', 'mno', 'AbCdEf')
   assert t == 'AnCdEf'
+  
   t = tr('abc', 'mno', 'AbCdEf', True)
   assert t == 'MnOdEf'
+ 
+  t = tr('abcdef', 'mno', 'abcdefghi')
+  assert t == 'mnoghi'
+  
   print('Checks passed OK')
   
 if __name__ == '__main__':
