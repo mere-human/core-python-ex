@@ -8,22 +8,27 @@ example, a goes to n and X goes to K. Obviously, numbers and symbols are immune
 from translation.
 '''
 import string
-def rot13(text):
-  # build a map
-  map = {}
-  offset = 13
-  base = ord(min(string.ascii_letters, key=ord))
-  print(base)
-  n_chars = len(string.ascii_letters)
-  for ch in string.ascii_letters:
+
+translate_map = {}
+
+def fill_map(map, letters, offset):
+  base = ord(min(letters, key=ord))
+  size = len(letters)
+  for ch in letters:
     src_idx = ord(ch) - base
-    dst_idx = (src_idx + offset) % n_chars
-    print('ch %s ord %d src %d dst %d ord %d ch %s' % (ch, ord(ch), src_idx, dst_idx, dst_idx + base, chr(dst_idx + base)))
+    dst_idx = (src_idx + offset) % size
     map[ch] = chr(dst_idx + base)
+
+def rot13(text):
+  if not translate_map:
+    # build a map
+    offset = 13
+    fill_map(translate_map, string.ascii_lowercase, offset)
+    fill_map(translate_map, string.ascii_uppercase, offset)
   # translate a string
   res = []
   for ch in text:
-    mapch = map.get(ch)
+    mapch = translate_map.get(ch)
     if mapch is None:
       # character is not mapped
       res.append(ch)
@@ -34,10 +39,9 @@ def rot13(text):
   
 def test():
   t = rot13('This is a short sentence.')
-  print(t)
   assert t == 'Guvf vf n fubeg fragrapr.'
   
-  t = rot13('This is a short sentence.')
+  t = rot13('Guvf vf n fubeg fragrapr.')
   assert t == 'This is a short sentence.'
   
   print('Checks passed OK')
