@@ -12,6 +12,7 @@ import getpass
 import distutils.util
 import os
 import pickle
+import base64
 
 db = {}
 db_file_name = 'users.db'
@@ -27,7 +28,7 @@ def get_pwd_hash(salt, pwd):
   return get_hash_str('%s%s' % (salt, get_hash_str(pwd)))
   
 def get_name_hash(name):
-  return hash(name.lower())
+  return base64.b64encode(name.lower().encode('utf-8'))
   
 def add_user(name, pwd, logtime = time.time()):
   salt = get_salt()
@@ -90,9 +91,12 @@ def showusers():
 
 def save_db():
   with open(db_file_name, 'wb') as f:
-    for k in db:
-      entry = db[k]
-      pickle.dump(entry, f)
+    pickle.dump(db, f)
+
+def load_db():
+  with open(db_file_name, 'rb') as f:
+    global db
+    db = pickle.load(f)
 
 def showmenu():
   prompt = """
@@ -100,6 +104,7 @@ def showmenu():
 (D)elete Existing User
 (S)how All Users
 (P)rint Debug Info
+(R)ead db file
 (Q)uit
 Enter choice: """
   done = False
@@ -111,7 +116,7 @@ Enter choice: """
       except (EOFError, KeyboardInterrupt):
         choice = 'q'
       print('\nYou picked: [%s]' % choice)
-      if choice not in 'ldspq':
+      if choice not in 'ldsprq':
         print('invalid option, try again')
       else:
         chosen = True
@@ -119,12 +124,13 @@ Enter choice: """
       done = True
       save_db()
     if choice == 'l': prompt_login()
+    if choice == 'r': load_db()
     if choice == 'd': deluser()
     if choice == 's': showusers()
     if choice == 'p': print(db)
 
 if __name__ == '__main__':
-  logtime = time.time() - 4*60*60
-  print(time.ctime(logtime))
-  add_user('a', 'a', logtime)
+  # logtime = time.time() - 4*60*60
+  # print(time.ctime(logtime))
+  # add_user('a', 'a', logtime)
   showmenu()
