@@ -11,8 +11,10 @@ import random
 import getpass
 import distutils.util
 import os
+import pickle
 
 db = {}
+db_file_name = 'users.db'
 
 def get_salt():
   num = random.getrandbits(256)
@@ -87,18 +89,10 @@ def showusers():
     print(' ', db[k]['name'])
 
 def save_db():
-  lines = []
-  for k in db:
-    entry = db[k]
-    line = []
-    for part in entry:
-      val = entry[part]
-      line.append(str(val))
-    lines.append(':'.join(line))
-  file_name = 'users.db'
-  with open(file_name, 'w') as f:
-    for line in lines:
-      f.write(line+'\n')
+  with open(db_file_name, 'wb') as f:
+    for k in db:
+      entry = db[k]
+      pickle.dump(entry, f)
 
 def showmenu():
   prompt = """
