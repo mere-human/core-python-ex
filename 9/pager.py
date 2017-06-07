@@ -5,7 +5,7 @@ key to continue.
 '''
 import sys
 def main():
-    file_name = sys.argv[0]
+    file_name = sys.argv[1]
     f = open(file_name)
     lines = f.readlines()
     f.close()
