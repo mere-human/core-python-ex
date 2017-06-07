@@ -1,9 +1,16 @@
-#!/usr/bin/env python3
+'''
+9-12. Users and Passwords.
+a. The data should be stored to disk, one line at a time, with fields delimited by
+colons ( : ), e.g., "joe:boohoo:953176591.145", for each user. The number of
+lines in the file will be the number of users that are part of your system.
+'''
+
 import time
 import hashlib
 import random
 import getpass
 import distutils.util
+import os
 
 db = {}
 
@@ -79,6 +86,20 @@ def showusers():
   for k in db:
     print(' ', db[k]['name'])
 
+def save_db():
+  lines = []
+  for k in db:
+    entry = db[k]
+    line = []
+    for part in entry:
+      val = entry[part]
+      line.append(str(val))
+    lines.append(':'.join(line))
+  file_name = 'users.db'
+  with open(file_name, 'w') as f:
+    for line in lines:
+      f.write(line+'\n')
+
 def showmenu():
   prompt = """
 (L)ogin
@@ -100,7 +121,9 @@ Enter choice: """
         print('invalid option, try again')
       else:
         chosen = True
-    if choice == 'q': done = True
+    if choice == 'q':
+      done = True
+      save_db()
     if choice == 'l': prompt_login()
     if choice == 'd': deluser()
     if choice == 's': showusers()
