@@ -1,8 +1,19 @@
 '''
 9-12. Users and Passwords.
+
 a. The data should be stored to disk, one line at a time, with fields delimited by
 colons ( : ), e.g., "joe:boohoo:953176591.145", for each user. The number of
 lines in the file will be the number of users that are part of your system.
+
+b. Further update your example such that instead of writing out one line at a
+time, you pickle the entire data object and write that out instead. Read the
+documentation on the pickle module to find out how to flatten or serialize yourobject, as well as how to perform I/O using picked objects. With the addition of
+this new code, your solution should take up fewer lines than your solution in
+part (a)
+
+c. Replace your login database and explicit use of pickle by converting your code
+to use shelve files. Your resulting source file should actually take up fewer lines
+than your solution to part (b) because some of the maintenance work is gone.
 '''
 
 import time
@@ -11,11 +22,11 @@ import random
 import getpass
 import distutils.util
 import os
-import pickle
+import shelve
 import base64
 
-db = {}
-db_file_name = 'users.db'
+db = None
+db_file_name = 'users'
 
 def get_salt():
   num = random.getrandbits(256)
@@ -28,7 +39,7 @@ def get_pwd_hash(salt, pwd):
   return get_hash_str('%s%s' % (salt, get_hash_str(pwd)))
   
 def get_name_hash(name):
-  return base64.b64encode(name.lower().encode('utf-8'))
+  return base64.b64encode(name.lower().encode('utf-8')).decode('utf-8')
   
 def add_user(name, pwd, logtime = time.time()):
   salt = get_salt()
@@ -89,22 +100,18 @@ def showusers():
   for k in db:
     print(' ', db[k]['name'])
 
-def save_db():
-  with open(db_file_name, 'wb') as f:
-    pickle.dump(db, f)
-
-def load_db():
-  with open(db_file_name, 'rb') as f:
-    global db
-    db = pickle.load(f)
+def print_debug():
+  for k in db:
+    print(k, ':', db[k])
 
 def showmenu():
+  global db
+  db = shelve.open(db_file_name)
   prompt = """
 (L)ogin
 (D)elete Existing User
 (S)how All Users
 (P)rint Debug Info
-(R)ead db file
 (Q)uit
 Enter choice: """
   done = False
@@ -116,18 +123,17 @@ Enter choice: """
       except (EOFError, KeyboardInterrupt):
         choice = 'q'
       print('\nYou picked: [%s]' % choice)
-      if choice not in 'ldsprq':
+      if choice not in 'ldspq':
         print('invalid option, try again')
       else:
         chosen = True
     if choice == 'q':
       done = True
-      save_db()
+      db.close()
     if choice == 'l': prompt_login()
-    if choice == 'r': load_db()
     if choice == 'd': deluser()
     if choice == 's': showusers()
-    if choice == 'p': print(db)
+    if choice == 'p': print_debug()
 
 if __name__ == '__main__':
   # logtime = time.time() - 4*60*60
