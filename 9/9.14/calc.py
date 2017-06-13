@@ -40,12 +40,34 @@ def num_calc(text):
     r = op_map[op](n1, n2)
     return r
 
+def print_log():
+    with open('calc.log', 'r+') as log:
+        for line in log:
+            print(line, end='')
+        log.truncate(0)
+
+def dump_log(text, result):
+    with open('calc.log', 'a') as log:
+        log.write(text)
+        log.write('\n')
+        log.write(str(result))
+        log.write('\n')
+
 def main():
     try:
-        if len(sys.argv) != 4:
-            raise CalcError('Expected 3 args')
-        r = num_calc(' '.join(sys.argv[1:]))
-        print(r)
+        argc = len(sys.argv)
+        if argc == 2:
+            if sys.argv[1] == 'print':
+                print_log()
+            else:
+                raise CalcError('Expected print command')
+        elif argc == 4:
+            text = ' '.join(sys.argv[1:])
+            r = num_calc(text)
+            print(r)
+            dump_log(text, r)
+        else:
+            raise CalcError('Expected 3 args, provided ' + str(argc))
     except EOFError as e:
         pass # exit silently
     except Exception as e:
