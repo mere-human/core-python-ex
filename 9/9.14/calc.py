@@ -8,6 +8,7 @@ operands. Hint: You may use the string split() method, but you cannot use the ex
 () built-in function.
 '''
 import operator
+import sys
 
 class CalcError(Exception):
     pass
@@ -22,7 +23,7 @@ def num_calc(text):
 
     op_list = text.split(' ')
     if len(op_list) != 3:
-        raise CalcError('Wrong input')
+        raise CalcError('Wrong input ' + str(op_list))
       
     n1, op, n2 = op_list
     if op not in op_map:
@@ -34,17 +35,15 @@ def num_calc(text):
     return r
 
 def main():
-    while True:
-        try:
-            text = input()
-            r = num_calc(text)
-            print(r)
-        except EOFError as e:
-            break
-        except Exception as e:
-            print('Error:', e)
-            break
-        
+    try:
+        if len(sys.argv) != 4:
+            raise CalcError('Expected 3 args')
+        r = num_calc(' '.join(sys.argv[1:]))
+        print(r)
+    except EOFError as e:
+        pass # exit silently
+    except Exception as e:
+        print('Error:', e)
 
 if __name__ == '__main__':
     main()
