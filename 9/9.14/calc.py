@@ -6,6 +6,12 @@ subtraction, multiplication, division, modulus/remainder, and exponentiation,
 respectively, and displays the result of carrying out that operation on the input
 operands. Hint: You may use the string split() method, but you cannot use the exal
 () built-in function.
+
+9-14. Logging Results. Convert your calculator program
+(Exercise 5-6) to take input from the command line, i.e.,
+Output the result only. Also, write each expression and result to a disk file. Issuing a
+command of print will cause the entire contents of the "register tape" to be dumped to the screen and
+file reset/truncated. 
 '''
 import operator
 import sys
