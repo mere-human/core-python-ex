@@ -6,7 +6,7 @@ import sys
 
 def main():
     if len(sys.argv) != 3:
-        raise ArgumentError('Expected 2 args with file names')
+        raise Exception('Expected 2 args with file names')
     src_file_name, dst_file_name = sys.argv[1:]
     print('Copy', src_file_name, 'into', dst_file_name)
     with open(src_file_name, 'r') as src_file,\
