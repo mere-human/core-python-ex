@@ -15,21 +15,25 @@ Stack class can perform both of the operations above correctly. You may subclass
 real list object or come up with your own list-like object.
 '''
 
-class Stack(object):
-    def __init__(self):
-        self.__list = []
+class BaseStack(object):
+    __slots__ = ()
 
     def push(self, obj):
-        self.__list.append(obj)
+        self.data.append(obj)
 
     def pop(self):
-        self.__list.pop()
+        return self.data.pop()
 
     def is_empty(self):
-        return len(self.__list) <= 0
+        return len(self.data) <= 0
 
     def peek(self):
-        return self.__list[-1]
+        return self.data[-1]
+
+class Stack(BaseStack):
+    __slots__ = ('data')
+    def __init__(self):
+        self.data = []
 
 def test():
     s = Stack()
@@ -40,7 +44,7 @@ def test():
     s.push(2)
     assert s.peek() == 2
 
-    s.pop()
+    assert s.pop() == 2
     assert s.peek() == 1
     assert s.is_empty() == False
 

@@ -7,23 +7,27 @@ dequeue() returns the first element and removes it from the list.
 See the previous problem and Example 6.4 for motivation.
 '''
 
-class Queue(object):
-    def __init__(self, seq=[]):
-        self.__list = list(seq)
+class BaseQueue(object):
 
     def enqueue(self, obj):
-        self.__list.append(obj)
+        self.data.append(obj)
 
     def dequeue(self):
-        return self.__list.pop(0)
+        return self.data.pop(0)
 
     def __str__(self):
-        return str(self.__list)
+        return str(self.data)
 
     __repr__ = __str__
 
     def __bool__(self):
-        return len(self.__list) > 0
+        return len(self.data) > 0
+
+class Queue(BaseQueue):
+    __slots__ = ('data')
+
+    def __init__(self, seq=[]):
+        self.data = list(seq)
 
 def test():
     q = Queue()
