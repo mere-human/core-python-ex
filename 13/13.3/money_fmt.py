@@ -37,17 +37,25 @@ the negative sign. The default argument should use the standard negative sign.
 '''
 
 def dollarize(value):
-    value = round(value, 2)
+    sign = '-' if value < 0 else ''
+    value = abs(round(value, 2))
     s = str(value)
     pos = s.rfind('.')
     fract = s[pos:]
     parts = []
-    while True:
-        if pos < 3:
-            parts.insert(0, s[0:pos])
-            break
-        parts.insert(0, s[pos-3:pos])
+    while pos > 0:
+        parts.insert(0, s[pos-3 if pos > 3 else 0:pos])
         pos -= 3
-    return '$' + ','.join(parts) + fract
+    return sign + '$' + ','.join(parts) + fract
 
-print(dollarize(1234567.8901))
+def check(val, pat):
+    s = dollarize(val)
+    assert s == pat, '%s should be %s' % (s, pat)
+
+def test():
+    check(1234567.8901, '$1,234,567.89')
+    check(123456.8901, '$123,456.89')
+    check(-22.3, '-$22.3')
+
+if __name__ == '__main__':
+    test()
