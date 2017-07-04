@@ -50,7 +50,7 @@ class MoneyFmt(object):
     def __str__(self):
         sign = '-' if self.value < 0 else ''
         value = abs(round(self.value, 2))
-        s = str(value)
+        s = '%.2f' % value
         pos = s.rfind('.')
         fract = s[pos:]
         parts = []
@@ -64,13 +64,13 @@ class MoneyFmt(object):
 
 
 def check_str(val, pat):
-    s = str(MoneyFmt(val))
+    s = str(val)
     assert s == pat, '%s should be %s' % (s, pat)
 
 def test():
-    check_str(1234567.8901, '$1,234,567.89')
-    check_str(123456.8901, '$123,456.89')
-    check_str(-22.3, '-$22.3')
+    check_str(MoneyFmt(1234567.8901), '$1,234,567.89')
+    check_str(MoneyFmt(123456.8901), '$123,456.89')
+    check_str(MoneyFmt(-22.3), '-$22.30')
 
     assert repr(MoneyFmt(123.89)) == '123.89'
     assert repr(MoneyFmt(-22)) == '-22.0'
@@ -81,6 +81,14 @@ def test():
         assert False, '1 should be converted to True'
     if not MoneyFmt(0.5):
         assert False, '0.5 should be converted to True'
+
+    cash = MoneyFmt(123.45)
+    check_str(cash, '$123.45')
+    cash.update(100000.4567)
+    check_str(cash, '$100,000.46')
+    cash.update(-0.3)
+    check_str(cash, '-$0.30')
+    assert repr(cash) == '-0.3'
 
 
 if __name__ == '__main__':
