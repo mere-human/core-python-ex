@@ -36,26 +36,48 @@ the negative sign. The default argument should use the standard negative sign.
 
 '''
 
-def dollarize(value):
-    sign = '-' if value < 0 else ''
-    value = abs(round(value, 2))
-    s = str(value)
-    pos = s.rfind('.')
-    fract = s[pos:]
-    parts = []
-    while pos > 0:
-        parts.insert(0, s[pos-3 if pos > 3 else 0:pos])
-        pos -= 3
-    return sign + '$' + ','.join(parts) + fract
+class MoneyFmt(object):
+    def __init__(self, value=0.0):
+        self.update(value)
 
-def check(val, pat):
-    s = dollarize(val)
+    def update(self, value=None):
+        self.value = float(value)
+
+    def __repr__(self):
+        return repr(self.value)
+
+    def __str__(self):
+        sign = '-' if self.value < 0 else ''
+        value = abs(round(self.value, 2))
+        s = str(value)
+        pos = s.rfind('.')
+        fract = s[pos:]
+        parts = []
+        while pos > 0:
+            parts.insert(0, s[pos-3 if pos > 3 else 0:pos])
+            pos -= 3
+        return sign + '$' + ','.join(parts) + fract
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+def check_str(val, pat):
+    s = str(MoneyFmt(val))
     assert s == pat, '%s should be %s' % (s, pat)
 
 def test():
-    check(1234567.8901, '$1,234,567.89')
-    check(123456.8901, '$123,456.89')
-    check(-22.3, '-$22.3')
+    check_str(1234567.8901, '$1,234,567.89')
+    check_str(123456.8901, '$123,456.89')
+    check_str(-22.3, '-$22.3')
+
+    assert repr(MoneyFmt(123.89)) == '123.89'
+    assert repr(MoneyFmt(-22)) == '-22.0'
+
+    if MoneyFmt():
+        assert False, 'Default should be converted to False'
+    if not MoneyFmt(1):
+        assert False, 'Positive should be converted to True'
 
 if __name__ == '__main__':
     test()
