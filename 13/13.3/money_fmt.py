@@ -30,6 +30,7 @@ method.
 c.
 Fix the bug in the __nonzero__() method, which currently thinks that any value
 less than one, i.e., fifty cents ($0.50), has a false value.
+
 d.Extra credit: Allow the user to optionally specify an argument indicating the
 desire to see less-than and greater-than pairs for negative values rather than
 the negative sign. The default argument should use the standard negative sign.
@@ -59,7 +60,7 @@ class MoneyFmt(object):
         return sign + '$' + ','.join(parts) + fract
 
     def __bool__(self):
-        return bool(self.value)
+        return self.value > 0.0
 
 
 def check_str(val, pat):
@@ -77,7 +78,10 @@ def test():
     if MoneyFmt():
         assert False, 'Default should be converted to False'
     if not MoneyFmt(1):
-        assert False, 'Positive should be converted to True'
+        assert False, '1 should be converted to True'
+    if not MoneyFmt(0.5):
+        assert False, '0.5 should be converted to True'
+
 
 if __name__ == '__main__':
     test()
