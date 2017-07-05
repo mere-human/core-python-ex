@@ -67,6 +67,8 @@ class Time60(object):
 
     def __add(self, hr, min):
         self.hr += hr
+        if self.min >= 24:
+            self.hr = self.hr % 24
         self.min += min
         if self.min >= 60:
             self.hr += self.min // 60
@@ -104,10 +106,12 @@ def main():
 
     assert str(Time60('10:30') + Time60('11:15')) == '21:45'
     assert str(Time60('10:30') + Time60('8:45')) == '19:15'
+    assert str(Time60('21:30') + Time60('8:45')) == '6:15'
 
     t = Time60('10:05')
     t += Time60('11:10')
     assert str(t) == '21:15'
+
     t = Time60('10:30')
     t += Time60('8:45')
     assert str(t) == '19:15'
