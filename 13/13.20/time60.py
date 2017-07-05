@@ -45,8 +45,18 @@ class Time60(object):
 
     def __init__(self, hr=0, min=0):
         'constructor - takes hours and minutes'
-        self.hr = hr
-        self.min = min
+        if isinstance(hr, tuple):
+            self.hr, self.min = hr
+        elif isinstance(hr, dict):
+            self.hr = hr['HR']
+            self.min = hr['min']
+        elif isinstance(hr, str):
+            l = hr.split(':')
+            self.hr = int(l[0])
+            self.min = int(l[1])
+        else:
+            self.hr = hr
+            self.min = min
 
     def __str__(self):
         'string representation'
@@ -68,6 +78,10 @@ class Time60(object):
 def main():
     assert str(Time60()) == '0:00'
     assert str(Time60(12, 5)) == '12:05'
+    assert str(Time60((10, 30))) == '10:30'
+    assert str(Time60({'HR':10, 'min':30})) == '10:30'
+    assert str(Time60('10:30')) == '10:30'
+    assert str(Time60('12:5')) == '12:05'
 
 if __name__ == '__main__':
     main()
