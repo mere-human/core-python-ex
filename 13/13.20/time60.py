@@ -62,18 +62,19 @@ class Time60(object):
         'string representation'
         return '%d:%02d' % (self.hr, self.min)
 
-    __repr__ = __str__
+    def __repr__(self):
+        return "%s(%d, %d)" % (self.__class__.__name__, self.hr, self.min)
 
     def __add__(self, other):
         'overloading the addition operator'
-        if isinstance(other, Time60):
+        if isinstance(other, self.__class__):
             return self.__class__(self.hr + other.hr, self.min + other.min)
         else:
             raise ValueError("Not supported operand's type")
 
     def __iadd__(self, other):
         'overloading in-place addition'
-        if isinstance(other, Time60):
+        if isinstance(other, self.__class__):
             self.hr += other.hr
             self.min += other.min
             return self
@@ -98,6 +99,10 @@ def main():
     t = Time60('10:05')
     t += Time60('11:10')
     assert str(t) == '21:15'
+
+    t = eval(repr(Time60('10:05')))
+    assert isinstance(t, Time60)
+    assert str(t) == '10:05'
 
 if __name__ == '__main__':
     main()
