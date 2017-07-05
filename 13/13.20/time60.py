@@ -66,22 +66,38 @@ class Time60(object):
 
     def __add__(self, other):
         'overloading the addition operator'
-        return self.__class__(self.hr + other.hr, self.min + other.min)
+        if isinstance(other, Time60):
+            return self.__class__(self.hr + other.hr, self.min + other.min)
+        else:
+            raise ValueError("Not supported operand's type")
 
     def __iadd__(self, other):
         'overloading in-place addition'
-        self.hr += other.hr
-        self.min += other.min
-        return self
+        if isinstance(other, Time60):
+            self.hr += other.hr
+            self.min += other.min
+            return self
+        else:
+            raise ValueError("Not supported operand's type")
+
+    # NOTE: __radd__ is not implemented since addition works only if
+    # both operands are of type Time60
 
 
 def main():
     assert str(Time60()) == '0:00'
     assert str(Time60(12, 5)) == '12:05'
+
     assert str(Time60((10, 30))) == '10:30'
     assert str(Time60({'HR':10, 'min':30})) == '10:30'
     assert str(Time60('10:30')) == '10:30'
     assert str(Time60('12:5')) == '12:05'
+
+    assert str(Time60('10:30') + Time60('11:15')) == '21:45'
+
+    t = Time60('10:05')
+    t += Time60('11:10')
+    assert str(t) == '21:15'
 
 if __name__ == '__main__':
     main()
