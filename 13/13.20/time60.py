@@ -67,6 +67,7 @@ class Time60(object):
 
 def main():
     assert str(Time60()) == '0:00'
+    assert str(Time60(12, 5)) == '12:05'
 
 if __name__ == '__main__':
     main()
