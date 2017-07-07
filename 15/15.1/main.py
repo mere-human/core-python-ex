@@ -1,3 +1,7 @@
+'''
+15-1. Recognize the following strings: "bat," "bit," "but," "hat," "hit," or "hut."
+'''
+
 import re
 
 expr = re.compile(r'(b|h)(a|i|u)t')
